@@ -17,6 +17,7 @@ class Category extends ActiveRecord
 {
     /**
      * @property integer $id
+     * @property string $name
      * @property string $title
      * @property string $description
      * @property integer $lft
@@ -38,17 +39,19 @@ class Category extends ActiveRecord
         return '{{%category}}';
     }
 
-    static function create($title, $description) : Category
+    static function create($name, $title, $description) : Category
     {
         $category = new static();
 
+        $category->name = $name;
         $category->title = $title;
         $category->description = $description;
 
         return $category;
     }
 
-    public function edit($title, $description, $parentId) {
+    public function edit($name, $title, $description) {
+        $this->name = $name;
         $this->title = $title;
         $this->description = $description;
     }

@@ -10,8 +10,22 @@ return [
     'id' => 'app-backend',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
-    'bootstrap' => ['log'],
-    'modules' => [],
+    'bootstrap' => ['log', 'debug'],
+    'modules' => [
+        'gii' => [
+            'class' => 'yii\gii\Module',
+            'allowedIPs' => [
+                '172.17.0.1'
+            ],
+        ],
+
+        'debug' => [
+            'class' => 'yii\debug\Module',
+            'allowedIPs' => [
+                '172.17.0.1'
+            ],
+        ],
+    ],
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',

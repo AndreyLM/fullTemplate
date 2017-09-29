@@ -1,7 +1,18 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: andrew
- * Date: 22.09.17
- * Time: 20:23
- */
+/* @var $this yii\web\View */
+/* @var $categoryForm domain\forms\category\CategoryForm */
+/* @var $categoryList array */
+
+
+$this->title = 'Создать категорию';
+$this->params['breadcrumbs'][] = ['label' => 'Категории', 'url' => ['index']];
+?>
+
+<div class="category-create">
+
+    <?= $this->render('_form', [
+        'categoryForm' => $categoryForm,
+        'categoryList' => $categoryList
+    ]) ?>
+
+</div>

@@ -11,19 +11,19 @@ use domain\entities\Category;
 use domain\forms\category\CategoryForm;
 use domain\DomainException;
 use domain\searches\CategorySearch;
+use yii\base\Exception;
+use yii\helpers\ArrayHelper;
 
 
 class CategoryManager
 {
-
-    private $category;
 
     public function __construct()
     {
 
     }
 
-    public function getSearchModel()
+    public function getSearchModel():CategorySearch
     {
         return new CategorySearch();
     }
@@ -37,40 +37,78 @@ class CategoryManager
         return $categories;
     }
 
-
-
-    public function create(CategoryForm $categoryForm)
+    public function getLoadedForm($id):CategoryForm
     {
-        $parentCategory = $this->getCategoryById($categoryForm->parent_id);
+        $categoryForm = new CategoryForm();
 
-        $this->category = Category::create($categoryForm->title, $categoryForm->description);
-
-        if(!$this->category->prependTo($parentCategory)->insert())
-            throw new DomainException('Cannot save category');
-
-        return true;
-    }
-
-    public function update(CategoryForm $categoryForm)
-    {
-        $this->category = $this->getCategoryById($categoryForm->id);
-        $this->category->title = $categoryForm->title;
-        $this->category->description = $categoryForm->description;
-
-        if($categoryForm->parent_id !== $this->category->parent->id) {
-            $parent = $this->getCategoryById($categoryForm->parent_id);
-            $this->category->prependTo($parent);
+        if(!$id) {
+            return $categoryForm;
         }
 
-        if(!$this->category->save()) {
-            throw new DomainException('Cannot update $category');
+        $category = $this->getCategoryById($id);
+
+        $categoryForm->id = $category->id;
+        $categoryForm->name = $category->name;
+        $categoryForm->title = $category->title;
+        $categoryForm->description = $category->description;
+        $categoryForm->parentId = $category->parent->id;
+        $categoryForm->parentName = $category->parent->name;
+
+        return $categoryForm;
+
+    }
+
+    public function remove($id) {
+
+        $category = $this->getCategoryById($id);
+        if($category->isRoot()) {
+            throw new DomainException('First remove all children categories');
         }
 
-        return true;
+        try {
+            $category->delete();
+        } catch (Exception $exception) {
+            throw new DomainException('Some issue with removing category');
+        }
+    }
+
+    public function create(CategoryForm $categoryForm):int
+    {
+
+        try {
+            $parentCategory = $this->getCategoryById($categoryForm->parentId);
+            $category = Category::create($categoryForm->name, $categoryForm->title, $categoryForm->description);
+            $category->prependTo($parentCategory)->insert();
+        } catch (Exception $exception) {
+            throw new DomainException('Cannot save category: '.$exception->getMessage());
+        }
+
+        return $category->id;
+    }
+
+    public function update(CategoryForm $categoryForm):int
+    {
+
+        try {
+            $category = $this->getCategoryById($categoryForm->id);
+
+            $category->name = $categoryForm->name;
+            $category->title = $categoryForm->title;
+            $category->description = $categoryForm->description;
+            if((integer)$categoryForm->parentId !== $category->parent->id) {
+                $parent = $this->getCategoryById($categoryForm->parentId);
+                $category->prependTo($parent);
+                $category->save();
+            }
+        } catch (Exception $exception) {
+            throw new DomainException('Problem with updating category: '. $exception);
+        }
+
+        return $category->id;
     }
 
 
-    public function getCategoryById($id)
+    public function getCategoryById($id):Category
     {
         if (!$category = Category::findOne(['id'=>$id]))
             throw new DomainException('Can not find a category');
@@ -78,10 +116,12 @@ class CategoryManager
 
     }
 
-    public function getCategoryList()
+    static function getCategoryArrayList():array
     {
-        $categories = Category::find()->orderBy('lft')->asArray();
-//        $cats = array_fi
-//        return array_map(function(i))
+        $categories = Category::find()->orderBy('lft')->all();
+
+        return ArrayHelper::map($categories, 'id', function(Category $category){
+            return str_repeat('--', $category->depth).' '.$category->name;
+        });
     }
 }

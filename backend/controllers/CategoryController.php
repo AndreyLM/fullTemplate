@@ -23,7 +23,6 @@ class CategoryController extends Controller
 
     public function __construct($id, Module $module, array $config = [])
     {
-//        echo 'here'; die;
 
         $this->manager = new CategoryManager();
 
@@ -44,14 +43,16 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function actionUpdate()
+    public function actionUpdate($id)
     {
-        $categoryForm = new CategoryForm();
+
+        $categoryForm = $this->manager->getLoadedForm($id);
+
 
         if($categoryForm->load(\Yii::$app->request->post())) {
             try {
-                $this->manager->update($categoryForm);
-                return $this->render('view');
+                $id = $this->manager->update($categoryForm);
+                return $this->redirect(['view', 'id' => $id]);
 
             } catch (DomainException $exception) {
                 \Yii::$app->session->setFlash('error', $exception->getMessage());
@@ -59,7 +60,8 @@ class CategoryController extends Controller
         }
 
         return $this->render('update', [
-            'category' => $categoryForm
+            'categoryForm' => $categoryForm,
+            'categoryList' => $this->manager->getCategoryArrayList()
         ]);
     }
 
@@ -69,28 +71,42 @@ class CategoryController extends Controller
 
         if($categoryForm->load(\Yii::$app->request->post())) {
             try {
-                $this->manager->create($categoryForm);
-                return $this->render('view');
+                $id = $this->manager->create($categoryForm);
+                return $this->redirect(['view' , 'id' => $id]);
             } catch (DomainException $exception) {
                 \Yii::$app->session->setFlash('error', $exception->getMessage());
             }
         }
 
+
         return $this->render('create', [
-            'category' => $categoryForm,
+            'categoryForm' => $categoryForm,
+            'categoryList' => $this->manager->getCategoryArrayList()
         ]);
     }
 
     public function actionView($id)
     {
         try {
-            $category = $this->manager->getCategoryById($id);
+            $categoryForm = $this->manager->getLoadedForm($id);
             return $this->render('view', [
-                'category' => $category,
+                'categoryForm' => $categoryForm,
             ]);
         } catch (DomainException $exception) {
-            return \Yii::$app->session->setFlash('error', $exception->getMessage());
+            \Yii::$app->session->setFlash('error', $exception->getMessage());
+            return $this->actionIndex();
         }
 
+    }
+
+    public function actionDelete($id)
+    {
+        try {
+            $this->manager->remove($id);
+        } catch (DomainException $exception) {
+            \Yii::$app->session->setFlash('error', $exception->getMessage());
+        }
+
+        $this->redirect(['index']);
     }
 }

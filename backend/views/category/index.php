@@ -25,11 +25,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
                 'columns' => [
+                        'name',
                     [
                         'attribute' => 'title',
                         'value' => function (Category $model) {
                             $indent = ($model->depth > 1 ? str_repeat('&nbsp;&nbsp;', $model->depth - 1) . ' ' : '');
-                            return $indent . Html::a(Html::encode($model->name), ['view', 'id' => $model->id]);
+                            return $indent . Html::a(Html::encode($model->title), ['view', 'id' => $model->id]);
                         },
                         'format' => 'raw',
                     ],

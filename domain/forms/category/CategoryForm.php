@@ -14,17 +14,19 @@ class CategoryForm extends Model
 {
 
     public $id;
+    public $name;
     public $title;
     public $description;
-    public $parent_id;
+    public $parentId;
+    public $parentName;
 
 
     public function rules()
     {
         return [
-            [['title', 'description'], 'required'],
-            [['title', 'description'], 'string'],
-            [['parent_id', 'id'], 'integer']
+            [['name', 'title', 'description'], 'required'],
+            [['title', 'description', 'parentName'], 'string'],
+            [['parentId', 'id'], 'integer']
         ];
     }
 

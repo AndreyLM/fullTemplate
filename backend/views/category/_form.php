@@ -3,8 +3,10 @@ use mihaildev\ckeditor\CKEditor;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
-/* @var $cat_model domain\forms\category\CategoryForm */
+/* @var $categoryForm domain\forms\category\CategoryForm */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $categoryList array */
+
 ?>
 
 <div class="category-form">
@@ -15,9 +17,10 @@ use yii\widgets\ActiveForm;
         <div class="box-header with-border">Common</div>
         <div class="box-body">
 
-            <?= $form->field($cat_model, 'parentId')->dropDownList($cat_model->parentCategoriesList()) ?>
-            <?= $form->field($cat_model, 'title')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($cat_model, 'description')->widget(CKEditor::className()) ?>
+            <?= $form->field($categoryForm, 'parentId')->dropDownList($categoryList) ?>
+            <?= $form->field($categoryForm, 'name')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($categoryForm, 'title')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($categoryForm, 'description')->widget(CKEditor::className()) ?>
 
         </div>
     </div>
