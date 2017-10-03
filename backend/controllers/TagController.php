@@ -2,9 +2,12 @@
 
 namespace backend\controllers;
 
+use domain\forms\tag\TagForm;
+use domain\managers\TagManager;
 use Yii;
 use domain\entities\Tag;
 use domain\searches\TagSearch;
+use yii\base\Module;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -29,13 +32,21 @@ class TagController extends Controller
         ];
     }
 
+    private $_tagManager;
+
+    public function __construct($id, Module $module, array $config = [])
+    {
+        $this->_tagManager = new TagManager();
+        parent::__construct($id, $module, $config);
+    }
+
     /**
      * Lists all Tag models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new TagSearch();
+        $searchModel = $this->_tagManager->getSearchModel();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -59,19 +70,24 @@ class TagController extends Controller
     /**
      * Creates a new Tag model.
      * If creation is successful, the browser will be redirected to the 'view' page.
+     * @param null $backUrl - url for returning if the action are called from another view
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($backUrl = null)
     {
-        $model = new Tag();
+        $tagForm = new TagForm();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+        if ($tagForm->load(Yii::$app->request->post())) {
+            $id = $this->_tagManager->save($tagForm);
+            if(!$backUrl)
+                return $this->redirect(['view', 'id' => $id]);
+            return $this->redirect($backUrl);
         }
+
+        return $this->render('create', [
+                'tagForm' => $tagForm,
+        ]);
+
     }
 
     /**
@@ -82,15 +98,16 @@ class TagController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $tagForm = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+        if ($tagForm->load(Yii::$app->request->post())) {
+            $this->_tagManager->update($tagForm);
+            return $this->redirect(['view', 'id' => $tagForm->id]);
         }
+
+        return $this->render('update', [
+                'tagForm' => $tagForm,
+        ]);
     }
 
     /**
@@ -101,7 +118,7 @@ class TagController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $this->_tagManager->remove($id);
 
         return $this->redirect(['index']);
     }
@@ -110,15 +127,16 @@ class TagController extends Controller
      * Finds the Tag model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Tag the loaded model
+     * @return domain\forms\tag\TagForm the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Tag::findOne($id)) !== null) {
+        if (($model = $this->_tagManager->getLoadedTagForm($id)) !== null) {
             return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
         }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+
     }
 }

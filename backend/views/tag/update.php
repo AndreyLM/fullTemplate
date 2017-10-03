@@ -3,11 +3,11 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model domain\entities\Tag */
+/* @var $tagForm domain\forms\tag\TagForm */
 
-$this->title = 'Update Tag: ' . $model->name;
+$this->title = 'Update Tag: ' . $tagForm->name;
 $this->params['breadcrumbs'][] = ['label' => 'Tags', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => $tagForm->name, 'url' => ['view', 'id' => $tagForm->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="tag-update">
@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = 'Update';
     <h1><?= Html::encode($this->title) ?></h1>
 
     <?= $this->render('_form', [
-        'model' => $model,
+        'tagForm' => $tagForm,
     ]) ?>
 
 </div>

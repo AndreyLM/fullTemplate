@@ -6,6 +6,8 @@ use yii\helpers\Html;
 /* @var $articleForm domain\forms\article\ArticleForm */
 /* @var $metaForm domain\forms\article\MetaForm */
 /* @var $categoryList array */
+/* @var $tagsForm domain\forms\article\TagsForm */
+/* @var $tagsList array */
 
 $this->title = 'Update Article: ' . $articleForm->title;
 $this->params['breadcrumbs'][] = ['label' => 'Articles', 'url' => ['index']];
@@ -20,6 +22,8 @@ $this->params['breadcrumbs'][] = 'Update';
         'articleForm' => $articleForm,
         'metaForm' => $metaForm,
         'categoryList' => $categoryList,
+        'tagsForm' => $tagsForm,
+        'tagsList' => $tagsList
     ]) ?>
 
 </div>

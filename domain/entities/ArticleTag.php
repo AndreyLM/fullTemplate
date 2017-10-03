@@ -3,6 +3,7 @@
 namespace domain\entities;
 
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%article_tag}}".
@@ -13,7 +14,7 @@ use Yii;
  * @property Article $article
  * @property Tag $tag
  */
-class ArticleTag extends \yii\db\ActiveRecord
+class ArticleTag extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -34,6 +35,15 @@ class ArticleTag extends \yii\db\ActiveRecord
             [['article_id'], 'exist', 'skipOnError' => true, 'targetClass' => Article::className(), 'targetAttribute' => ['article_id' => 'id']],
             [['tag_id'], 'exist', 'skipOnError' => true, 'targetClass' => Tag::className(), 'targetAttribute' => ['tag_id' => 'id']],
         ];
+    }
+
+    public static function create(int $articleId, $tagId) {
+        $articleTag = new self();
+
+        $articleTag->article_id = $articleId;
+        $articleTag->tag_id = $tagId;
+
+        return $articleTag;
     }
 
     /**

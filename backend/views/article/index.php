@@ -1,11 +1,15 @@
 <?php
 
+
+use domain\entities\Article;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel domain\searches\ArticleSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $categoryList array */
 use domain\managers\ArticleManager;
 
 $this->title = 'Articles';
@@ -27,10 +31,16 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'category_id',
                 'label' => 'Category',
-                'filter' =>  ArticleManager::getCategoryList(),
+                'filter' =>  $categoryList,
                 'value' => 'category.name',
             ],
-            'tag',
+            [
+                'label' => 'Tags',
+                'attribute' => 'tag',
+                'value' => function (Article $product) {
+                    return implode(', ', ArrayHelper::map($product->tags, 'id', 'name'));
+                },
+            ],
             'title',
             'slug',
             [

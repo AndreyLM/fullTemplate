@@ -13,18 +13,24 @@ use domain\DomainException;
 use domain\entities\Article;
 use domain\forms\article\ArticleForm;
 use domain\forms\article\MetaForm;
+use domain\forms\article\TagsForm;
 use domain\searches\ArticleSearch;
-use yii\base\Exception;
+
 
 class ArticleManager
 {
+    private $tagNames = [];
+    private $tagIds = [];
+    private $tagManager;
+
+    public function __construct()
+    {
+        $this->tagManager = new ArticleTagManager();
+    }
 
     public function getById($id):Article {
-        try {
-            $article = Article::findOne($id);
-        } catch (Exception $exception) {
-            throw new DomainException('Problem with loading article');
-        }
+        if(!$article = Article::findOne($id))
+            throw new DomainException('Cannot find article');
 
         return $article;
     }
@@ -40,6 +46,7 @@ class ArticleManager
     }
 
     public function getLoadedMetaForm($articleId) {
+
         $article = $this->getById($articleId);
 
         return MetaForm::create($article->meta->title, $article->meta->description,
@@ -52,27 +59,25 @@ class ArticleManager
     }
 
 
-    public function create(ArticleForm $articleForm, MetaForm $metaForm)
+    public function create(ArticleForm $articleForm, MetaForm $metaForm, TagsForm $tagsForm)
     {
 
-        try {
-            $article = Article::create($articleForm->category_id,
-                $articleForm->title,
-                $articleForm->short_text,
-                $articleForm->full_text,
-                $articleForm->status,
-                $metaForm);
 
-            $article->save();
+        $article = Article::create($articleForm->category_id,
+            $articleForm->title,
+            $articleForm->short_text,
+            $articleForm->full_text,
+            $articleForm->status,
+            $metaForm);
 
-        } catch (Exception $exception) {
-            throw new DomainException('Problem with creating article: '.$exception->getMessage());
-        }
+        if(!$article->save())
+            throw new DomainException('Problem with creating article: ');
+
 
         return $article->id;
     }
 
-    public function update(ArticleForm $articleForm, MetaForm $metaForm) {
+    public function update(ArticleForm $articleForm, MetaForm $metaForm, TagsForm $tagsForm) {
 
         $article = $this->getById($articleForm->id);
 
@@ -85,11 +90,14 @@ class ArticleManager
             strtotime($articleForm->published_at),
             $metaForm);
 
-        try {
-            $article->save();
-        } catch (Exception $exception) {
-            throw new DomainException('Cannot save article: '. $exception->getMessage());
-        }
+
+        if(!$article->save())
+            throw new DomainException('Cannot save article');
+
+        if(!$this->tagManager->updateTags($article->id, $tagsForm))
+            throw new DomainException('Cannot save tags for article');
+
+
 
         return $article->id;
     }
@@ -98,17 +106,38 @@ class ArticleManager
     {
         $article = $this->getById($id);
 
-        try {
-            $article->delete();
-        } catch (Exception $exception) {
+        if(!$article->delete())
             throw new DomainException('Some issue with removing article');
-        }
+
 
         return true;
     }
 
-    static function getCategoryList()
+    public function loadTags($id)
+    {
+        $article = $this->getById($id);
+
+        foreach ($article->getTags()->asArray()->all() as $item) {
+            $this->tagNames[] = $item['name'];
+            $this->tagIds[] = $item['id'];
+        }
+    }
+
+    public function getTagNames()
+    {
+        return $this->tagNames;
+    }
+
+    public function getTagIds()
+    {
+        return $this->tagIds;
+    }
+
+
+
+    static function getCategoryList():array
     {
         return CategoryManager::getCategoryArrayList();
     }
+
 }

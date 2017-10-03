@@ -2,13 +2,17 @@
 date_default_timezone_set('Europe/Kiev');
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+//use yii\widgets\ActiveForm;
+use yii\bootstrap\ActiveForm;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $articleForm domain\forms\article\ArticleForm */
 /* @var $metaForm domain\forms\article\MetaForm */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $categoryList array */
+/* @var $tagsForm domain\forms\article\TagsForm */
+/* @var $tagsList array */
 ?>
 
 <div class="article-form">
@@ -37,6 +41,16 @@ use yii\widgets\ActiveForm;
 
         </div>
     </div>
+
+    <div class="box box-default">
+        <div class="box-header with-border">Tags</div>
+        <div class="box-body">
+            <?= $form->field($tagsForm, 'existing')->checkboxList($tagsList)->label('')?>
+            <a href="<?= Url::to(['tag/create', 'backUrl' => Yii::$app->request->url])?>"
+               class="btn btn-success">Add new tag</a>
+        </div>
+    </div>
+
 
     <div class="box box-default">
         <div class="box-header with-border">Meta</div>

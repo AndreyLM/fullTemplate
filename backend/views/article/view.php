@@ -6,6 +6,8 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $metaForm domain\forms\article\MetaForm */
 /* @var $articleForm domain\forms\article\MetaForm */
+/* @var $tags string */
+
 date_default_timezone_set('Europe/Kiev');
 
 use domain\forms\article\ArticleForm;
@@ -62,6 +64,16 @@ $this->params['breadcrumbs'][] = $this->title;
             ]) ?>
         </div>
     </div>
+
+    <div class="box box-default">
+        <div class="box-header">
+            Tags
+        </div>
+        <div class="box-body">
+            <p><?= Html::encode($tags); ?></p>
+        </div>
+    </div>
+
     <div class="box box-default">
             <div class="box-header">
                 Meta information

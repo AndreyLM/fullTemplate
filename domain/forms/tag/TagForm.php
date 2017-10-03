@@ -15,6 +15,8 @@ class TagForm extends Model
     public $id;
     public $name;
 
+    public $isNewRecord = true;
+
     public function rules() {
         return [
             ['id', 'integer'],

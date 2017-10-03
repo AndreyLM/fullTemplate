@@ -43,7 +43,7 @@ class ArticleSearch extends Article
      */
     public function search($params)
     {
-        $query = Article::find()->with(['category', 'tags'])->joinWith('articleTags');
+        $query = Article::find()->joinWith(['category', 'tags']);
 
 
         // add conditions that should always apply here
@@ -71,6 +71,7 @@ class ArticleSearch extends Article
 
         $query->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'slug', $this->slug])
+            ->andFilterWhere(['like', 'tag.name', $this->tag])
             ->andFilterWhere(['like', 'short_text', $this->short_text])
             ->andFilterWhere(['like', 'full_text', $this->full_text])
             ->andFilterWhere(['like', 'meta_json', $this->meta_json]);
