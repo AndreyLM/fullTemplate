@@ -1,10 +1,12 @@
 <?php
+
 date_default_timezone_set('Europe/Kiev');
 
 use yii\helpers\Html;
-//use yii\widgets\ActiveForm;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Url;
+use mihaildev\ckeditor\CKEditor;
+use mihaildev\elfinder\ElFinder;
 
 /* @var $this yii\web\View */
 /* @var $articleForm domain\forms\article\ArticleForm */
@@ -28,9 +30,12 @@ use yii\helpers\Url;
 
             <?= $form->field($articleForm, 'slug')->textInput(['maxlength' => true]) ?>
 
-            <?= $form->field($articleForm, 'short_text')->textarea(['rows' => 6]) ?>
+            <?= $form->field($articleForm, 'short_text')->widget(CKEditor::className()) ?>
 
-            <?= $form->field($articleForm, 'full_text')->textarea(['rows' => 6]) ?>
+            <?= $form->field($articleForm, 'full_text')
+                ->widget(CKEditor::className() ,[
+                        'editorOptions' => ElFinder::ckeditorOptions('elfinder', [])
+                ]) ?>
 
             <?= $form->field($articleForm, 'status')->checkbox() ?>
 

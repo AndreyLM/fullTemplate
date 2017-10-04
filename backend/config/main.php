@@ -11,6 +11,11 @@ return [
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log', 'debug'],
+    'aliases' => [
+        '@staticRoot' => $params['staticPath'],
+        '@static' => $params['staticHostInfo'],
+    ],
+
     'modules' => [
         'gii' => [
             'class' => 'yii\gii\Module',
@@ -26,6 +31,29 @@ return [
             ],
         ],
     ],
+
+    'controllerMap' => [
+        'elfinder' => [
+            'class' => 'mihaildev\elfinder\Controller',
+            'access' => ['@'],
+            'plugin' => [
+                [
+                    'class'=>'\mihaildev\elfinder\plugin\Sluggable',
+                    'lowercase' => true,
+                    'replacement' => '-'
+                ]
+            ],
+            'roots' => [
+                [
+                    'baseUrl'=>'@static',
+                    'basePath'=>'@staticRoot',
+                    'path' => 'files',
+                    'name' => 'Global'
+                ],
+            ],
+        ],
+    ],
+
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
@@ -51,6 +79,10 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+
+
+
+
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,
